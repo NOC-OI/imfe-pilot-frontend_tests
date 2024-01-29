@@ -1,0 +1,40 @@
+default:
+  image: python:3.9
+
+stages:
+  - build
+  - test
+  - deploy
+  - cleanup
+
+test-job:
+  stage: test
+  tags: 
+    - docker
+  script:
+    - pip install -r requirements.txt
+    - make black
+    - make check_code
+
+build-job:
+  stage: build
+  tags: 
+    - shell
+  script:
+    - docker build -t frontend_test:latest .
+
+
+selenium-job:
+  stage: deploy
+  tags:
+    - shell
+  script:
+    - ./deploy.sh
+
+cleanup:
+  stage: cleanup
+  tags:
+    - shell  
+  script:
+    - docker stop frontend api_calculations_use_cases_web_1 tileserver_titiler-uvicorn_1 tileserver_mbtiles_1
+  when: always

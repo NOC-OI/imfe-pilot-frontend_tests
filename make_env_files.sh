@@ -1,0 +1,61 @@
+#!/bin/bash
+
+HYPERVISOR=`lscpu | grep "^Hypervisor" | awk '{print $3}'`
+
+#hypervisor is VMWare on JASMIN and KVM for Oracle
+if [ "$HYPERVISOR" = "VMware" ] ; then
+    OBJECT_STORE_URL=https://pilot-imfe-o.s3-ext.jc.rl.ac.uk/
+    VITE_LAYERS_JSON_URL=${OBJECT_STORE_URL}haig-fras/frontend/layers.json
+    VITE_LAYERS3D_JSON_URL=${OBJECT_STORE_URL}haig-fras/frontend/layers3d.json
+    AWS_REGION=eu-west-2
+else #oracle or local build
+    OBJECT_STORE_URL=https://lrl8vbuxj1ma.compat.objectstorage.uk-london-1.oraclecloud.com/
+    VITE_LAYERS_JSON_URL=${OBJECT_STORE_URL}haig-fras/frontend/layers_oracle.json
+    VITE_LAYERS3D_JSON_URL=${OBJECT_STORE_URL}haig-fras/frontend/layers3d_oracle.json
+    AWS_REGION=uk-london-1
+fi
+
+echo "VITE_MAPBOX_API_KEY=$VITE_MAPBOX_API_KEY
+VITE_GOOGLEMAP_API_KEY=$VITE_GOOGLEMAP_API_KEY
+VITE_WEBSITE_JSON_URL=/website.json
+VITE_SERVER_ENDPOINT=http://localhost:8080/
+VITE_ORCID_CLIENT_ID=$VITE_ORCID_CLIENT_ID
+VITE_ORCID_CLIENT_SECRET=$VITE_ORCID_CLIENT_SECRET
+VITE_LAYERS_JSON_URL=$VITE_LAYERS_JSON_URL
+VITE_LAYERS3D_JSON_URL=$VITE_LAYERS3D_JSON_URL
+VITE_CESIUM_TOKEN=$VITE_CESIUM_TOKEN
+VITE_JASMIN_OBJECT_STORE_URL=$OBJECT_STORE_URL
+VITE_MBTILES_URL=http://localhost:8082/
+VITE_LOGIN=0
+VITE_API_URL=http://localhost:8081/
+VITE_ORCID_CLIENT_REDIRECT_URI=https://imfe-pilot.noc.ac.uk/auth
+VITE_TILE_SERVER_URL=http://localhost:8083/" > .env-frontend
+
+echo "JASMIN_API_URL=$OBJECT_STORE_URL
+JASMIN_TOKEN=$JASMIN_TOKEN
+JASMIN_SECRET=$JASMIN_SECRET
+HASH_TOKEN='$HASH_TOKEN'
+DATABASE_URL=postgresql+psycopg2://postgres:postgres@db:5432
+VITE_SERVER_ENDPOINT=https://imfe-pilot.noc.ac.uk/
+VITE_ORCID_CLIENT_ID=$VITE_ORCID_CLIENT_ID
+VITE_ORCID_CLIENT_SECRET=$VITE_ORCID_CLIENT_SECRET
+VITE_ORCID_CLIENT_REDIRECT_URI=https://imfe-pilot.noc.ac.uk/auth" > .env-api
+
+echo "HASH_TOKEN='$HASH_TOKEN'
+MBTILES__2__URL=${OBJECT_STORE_URL}haig-fras-versioning/mbtiles/habitats_new-65536.mbtiles
+MBTILES__2__MIN_ZOOM=0
+MBTILES__2__MAX_ZOOM=30
+MBTILES__2__IDENTIFIER=mytiles2
+MBTILES__2__VERSION=1.0.0
+PORT=8082
+MBTILES__1__URL=${OBJECT_STORE_URL}haig-fras-versioning/mbtiles/habitats_new-65536.mbtiles
+MBTILES__1__MIN_ZOOM=0
+MBTILES__1__MAX_ZOOM=30
+MBTILES__1__IDENTIFIER=mytiles
+MBTILES__1__VERSION=1.0.0
+AWS_REGION=$AWS_REGION
+AWS_ACCESS_KEY_ID=$JASMIN_TOKEN
+AWS_SECRET_ACCESS_KEY=$JASMIN_SECRET
+HTTP_ACCESS_CONTROL_ALLOW_ORIGIN=*
+AWS_ENDPOINT=$OBJECT_STORE_URL" > .env-tileserver
+
